@@ -1,0 +1,28 @@
+[project]
+name = "trace-reasoner"
+version = "0.1.0"
+description = "Multi-agent distributed-trace anomaly localization (CMU Agentic AI capstone)"
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest>=8"]
+agent = ["anthropic>=0.40", "openai>=1.0"]   # openai SDK drives the local OpenAI-compatible backend
+mcp = ["mcp[cli]>=1.2"]
+rag = ["langchain", "langchain-community", "langchain-huggingface", "sentence-transformers", "faiss-cpu"]
+multiagent = ["langgraph>=1.0"]
+ui = ["streamlit>=1.40"]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+# Only trace_reasoner is the package; data/ (cloned datasets) and the root run_*.py
+# scripts are not, so pin discovery instead of letting flat-layout auto-discovery guess.
+[tool.setuptools.packages.find]
+include = ["trace_reasoner*"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"

@@ -1,0 +1,20 @@
+flowchart TD
+    T[Trace in] --> G[Input guardrails: size cap, injection scan, secret redaction]
+    G -->|trip| H[Escalate to on-call SRE]
+    G --> CORE
+    subgraph CORE[Reasoning core: one of A / B / C]
+        direction TB
+        A1[A: monolithic ReAct]
+        B1[B: latency + dependency + pattern specialists, synthesizer]
+        C1[C: B as generators + critic + beam search]
+    end
+    CORE --> TOOLS[Grounded tools: walk_tree, baseline_latency, retrieve_precedents, rerun_scenario]
+    TOOLS --> CORE
+    CORE --> VER[Source verification: drop hallucinated spans, enforce schema]
+    VER --> R{Trust/risk router: confidence, margin, OOD}
+    R -->|AUTO| OUT[Deliver ranked top-3 to SRE]
+    R -->|REVIEW| OUT
+    R -->|ESCALATE| H
+    OUT --> FB[(Logged traces + outcomes)]
+    H --> FB
+    FB -->|offline feedback| CORE
