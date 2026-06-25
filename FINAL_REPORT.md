@@ -2,9 +2,6 @@
 
 Diwanshu Jain · Research Assistant track · Project: Trace-Reasoner
 
-> Final Capstone Report, organized against the Activity 7.1 planning template (ten sections). The
-> companion presentation outline and the public repository link live at the end.
-
 ## 1. Project title
 
 **Trace-Reasoner: a calibrated multi-agent assistant for distributed-trace root-cause localization.**
@@ -26,7 +23,7 @@ The intended user is the on-call SRE who has just been paged at 2am for a latenc
 - **Advisory only.** The agent diagnoses; it never remediates. There is no production write path. This bounds the worst-case harm to misdirection rather than an outage.
 - **One trace per run.** The unit of work is a single trace, not a fleet-wide correlation problem. That keeps the task well-posed and the evaluation labelable.
 - **Iso-token budget.** The whole project is built around one controlled experiment (Section 4), so total tool calls is a controlled variable. Every architectural choice has to pay for itself inside a fixed compute envelope.
-- **Public data only.** I deliberately use public datasets (synthetic injected-fault traces and the Nezha FSE'23 benchmark) rather than traces from work, so a reviewer can rerun the project end to end.
+- **Public data only.** I deliberately use public datasets (synthetic injected-fault traces and the Nezha FSE'23 benchmark) so a reviewer can rerun the project end to end.
 
 ## 4. Final system architecture
 
@@ -203,7 +200,7 @@ The current operating point produces a full AUTO/REVIEW/ESCALATE spread, but its
 
 The implementation lives in a public repository with a README that explains the project, problem, architecture, setup steps, and usage; the full `trace_reasoner` package; the synthetic and Nezha dataset loaders; the evaluation scripts (`eval_baseline.py`, `eval_conditions.py`, `eval_aggregate.py`) and their sample output; and a Streamlit demo. The comparison runs offline with no API key, so a reviewer can reproduce the headline table in one command.
 
-**Repository:** `[PUBLIC GITHUB URL PENDING — repo not yet created; see follow-up]`
+**Repository:** https://github.com/diwanshu97/trace-reasoner
 
 Minimum contents, confirmed present in the build:
 
