@@ -1,4 +1,4 @@
-# Capstone Final Report — Trace-Reasoner
+# Capstone Final Report: Trace-Reasoner
 
 Diwanshu Jain · Research Assistant track · Project: Trace-Reasoner
 
@@ -73,12 +73,12 @@ Each module pushed the design from a vague idea to a concrete, defended architec
 
 | Module | What changed | Why it improved the system |
 |---|---|---|
-| 1, Problem framing | Defined the agent, the 2am-SRE user, and the calibration-over-accuracy commitment | Set the success criterion that every later choice is measured against: honest uncertainty beats confident error |
-| 2, Agent design | Made the loop concrete: constrained ReAct, a structured belief state, four grounded tools | Tied each component to a specific failure of prompt-only models; the belief state stops the loop re-walking ruled-out subtrees |
-| 3, Retrieval | Added semantic RAG (FAISS, BGE-small) next to structural search | Diagnosis is analogy: retrieval moves the agent off the obvious slow leaf toward the real cause, while staying advisory so a lexical match cannot become a confident misattribution |
-| 4, Tree-of-Thought | Specified Condition C: beam search over hypotheses, generator split from critic | A linear chain commits to one causal story too early and burns the budget backing out; keeping three hypotheses alive defers commitment until the evidence decides |
-| 5, Multi-agent | Specified Condition B: three specialists plus a synthesizer, hub-and-spoke | Separate contexts stop a loud signal in one lens (raw latency) from crowding out a subtle one (a victim span), which a single context cannot guarantee |
-| 6, Safety | Wrapped the whole thing in guardrails, calibration metrics, and a trust/risk router | Turned "be honest about uncertainty" from an aspiration into an enforced operating policy: the router abstains on the cases the agent cannot calibrate |
+| 1. Problem framing | Defined the agent, the 2am-SRE user, and the calibration-over-accuracy commitment | Set the success criterion that every later choice is measured against: honest uncertainty beats confident error |
+| 2. Agent design | Made the loop concrete: constrained ReAct, a structured belief state, four grounded tools | Tied each component to a specific failure of prompt-only models; the belief state stops the loop re-walking ruled-out subtrees |
+| 3. Retrieval | Added semantic RAG (FAISS, BGE-small) next to structural search | Diagnosis is analogy: retrieval moves the agent off the obvious slow leaf toward the real cause, while staying advisory so a lexical match cannot become a confident misattribution |
+| 4. Tree-of-Thought | Specified Condition C: beam search over hypotheses, generator split from critic | A linear chain commits to one causal story too early and burns the budget backing out; keeping three hypotheses alive defers commitment until the evidence decides |
+| 5. Multi-agent | Specified Condition B: three specialists plus a synthesizer, hub-and-spoke | Separate contexts stop a loud signal in one lens (raw latency) from crowding out a subtle one (a victim span), which a single context cannot guarantee |
+| 6. Safety | Wrapped the whole thing in guardrails, calibration metrics, and a trust/risk router | Turned "be honest about uncertainty" from an aspiration into an enforced operating policy: the router abstains on the cases the agent cannot calibrate |
 
 The most important refinement was reframing the project as a **controlled experiment** rather than a single agent. From Checkpoint 4 on, A, B, and C are three conditions at an equal token budget, which makes "did multi-agent decomposition help, and did Tree-of-Thought on top of it help" a measurable question instead of an assertion.
 
@@ -107,9 +107,9 @@ The design principle behind the backend abstraction is that the brain is swappab
 
 | Condition | top-1 (latency) | top-1 (mixed) | ECE (latency) | ECE (mixed) |
 |---|---|---|---|---|
-| A, ReAct | 0.995 ± 0.01 | 0.695 ± 0.05 | 0.151 ± 0.003 | 0.194 ± 0.038 |
-| B, multi-agent | 0.990 ± 0.01 | 0.680 ± 0.04 | **0.070 ± 0.010** | **0.041 ± 0.021** |
-| C, plus ToT | 0.990 ± 0.01 | 0.680 ± 0.04 | 0.384 ± 0.010 | 0.380 ± 0.020 |
+| A. ReAct | 0.995 ± 0.01 | 0.695 ± 0.05 | 0.151 ± 0.003 | 0.194 ± 0.038 |
+| B. multi-agent | 0.990 ± 0.01 | 0.680 ± 0.04 | **0.070 ± 0.010** | **0.041 ± 0.021** |
+| C. plus ToT | 0.990 ± 0.01 | 0.680 ± 0.04 | 0.384 ± 0.010 | 0.380 ± 0.020 |
 
 The top-1 column needs reading with care, because it hides the result that matters. On pure-latency faults all three conditions are essentially perfect (~0.99). The drop on the mixed set is uniform across conditions because the mock has no error-localization heuristic, so every condition misses the error-fault traces, and a miss scores zero in top-1 whether the agent guessed wrong or honestly abstained. Top-1 cannot tell those two failures apart. That is exactly why calibration is the primary metric, and it is where the conditions separate sharply.
 
@@ -126,9 +126,9 @@ The breakdown below (mean over 5 seeds, mixed faults, as a share of all 40 trace
 
 | Condition | Localized correctly | Honestly abstained | Confidently wrong |
 |---|---|---|---|
-| A, ReAct | 68% | 0% | **30%** |
-| B, multi-agent | 68% | 30% | 2% |
-| C, plus ToT | 68% | 28% | 2% |
+| A. ReAct | 68% | 0% | **30%** |
+| B. multi-agent | 68% | 30% | 2% |
+| C. plus ToT | 68% | 28% | 2% |
 
 The accuracy-coverage curve makes the consequence concrete. **Condition B answers about 70% of traces and is right 97% of the time on what it answers**: it defers the rest rather than guess. **Condition A answers everything (100% coverage) and pays for it at 69% accuracy**, wrong on the error cases. Same localization skill, opposite trustworthiness. The multi-agent decomposition buys the discipline to abstain, which is the property the project set out to earn.
 
@@ -142,9 +142,9 @@ One honest qualification on the confidence scale. All three conditions are curre
 
 | Condition | top-1 | ECE | escalation |
 |---|---|---|---|
-| A, ReAct | 0.600 | 0.165 | 0.00 |
-| B, multi-agent | 0.900 | **0.014** | 0.10 |
-| C, plus ToT | **1.000** | 0.390 | 0.00 |
+| A. ReAct | 0.600 | 0.165 | 0.00 |
+| B. multi-agent | 0.900 | **0.014** | 0.10 |
+| C. plus ToT | **1.000** | 0.390 | 0.00 |
 
 On a model roughly an order of magnitude smaller than Claude, the architecture gains survive and are visible in raw accuracy: the monolithic agent localizes 6 of 10, the multi-agent decomposition 9 of 10, and the Tree-of-Thought variant all 10. Calibration tracks the mock result, with B the best-calibrated and C under-confident. The sample is small (n=10, a single seed) and the per-condition difference of a few traces should be read as directional rather than precise, but the direction is the one the design predicts and matches the earlier single-trace Claude observation.
 
@@ -152,9 +152,9 @@ On a model roughly an order of magnitude smaller than Claude, the architecture g
 
 | Condition | top-1 | F1 | Brier | ECE | escalation |
 |---|---|---|---|---|---|
-| A, ReAct | 0.400 | 0.400 | 0.174 | 0.270 | 0.250 |
-| B, multi-agent | **0.600** | 0.600 | 0.243 | 0.295 | **0.050** |
-| C, plus ToT | 0.550 | 0.550 | 0.087 | 0.397 | 0.450 |
+| A. ReAct | 0.400 | 0.400 | 0.174 | 0.270 | 0.250 |
+| B. multi-agent | **0.600** | 0.600 | 0.243 | 0.295 | **0.050** |
+| C. plus ToT | 0.550 | 0.550 | 0.087 | 0.397 | 0.450 |
 
 Two things read out of this. First, the architecture advantage on accuracy survives the harder fault mix: both decomposed conditions beat monolithic A on top-1 (B at 0.60 and C at 0.55 against A's 0.40), and B does it while abstaining the least (escalation 0.05). On a live brain, B is the practical winner, the most often right and the most willing to answer.
 
